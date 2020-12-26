@@ -1,1 +1,12 @@
-# Smart-contact-manager-Spring-Boot-Spring-Security
+# Smart-Contact-Manager using Spring-Boot + Spring-Security
+
+we require following dependencies
+
+starter-web
+starter-thymeleaf
+starter-data-jpa
+starter-security
+spring-boot-devtools
+mysql-connector-java
+validation-api
+hibernate-validator
