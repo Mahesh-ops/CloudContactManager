@@ -23,7 +23,7 @@
 
 
 <!--    Navbar-->
-<nav class="navbar navbar-expand-lg navbar-dark  bg-primary">
+<nav class="fixed-top navbar navbar-expand-lg navbar-dark  bg-primary">
 
     <a class="navbar-brand" href="#">Smart Contact Manager</a>
 
@@ -56,16 +56,16 @@
 <!--This is area where we are going to design sidebar and other area of main contecnt-->
 
 <!--This is sidebar-->
-<div class="sidebar">
+<div class="sidebar mt-2">
 
     <span onclick="toggleSidebar()" class="crossBtn">&times;</span>
 
-    <a href="#" class="item"><i class="fas fa-home"></i> Home</a>
+    <a href="#" th:href="@{/user/index}" class="item"><i class="fas fa-home"></i> Home</a>
     <a href="#" class="item"><i class="fas fa-id-card-alt"></i> View Contacts</a>
-    <a href="#" class="item"><i class="fas fa-pencil-alt"></i> Add Contacts</a>
+    <a href="#" th:href="@{/user/add-contact}" class="item"><i class="fas fa-pencil-alt"></i> Add Contacts</a>
     <a href="#" class="item"><i class="fas fa-user-circle"></i> Your Profile</a>
     <a href="#" class="item"><i class="fas fa-cogs"></i> Settings</a>
-    <a href="#" class="item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <a href="#" th:href="@{/logout}" class="item"><i class="fas fa-sign-out-alt"></i> Logout</a>
 
     <div class="divider"></div>
 
@@ -75,7 +75,7 @@
 
 
 <!--Main content area will always shown here-->
-<div class="content">
+<div class="content mt-5">
 
     <i onclick="toggleSidebar()" class="fas fa-bars m-3"></i>
     <div th:replace="${content}"></div>
