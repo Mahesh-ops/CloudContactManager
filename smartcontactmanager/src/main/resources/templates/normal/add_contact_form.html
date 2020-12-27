@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Contact </title>
+
+
 </head>
 <body>
 <section>
@@ -30,7 +32,7 @@
                                 </div>
                             </div>
 
-                            <input type="text" id="firstName" name="name" placeholder="Enter your name" class="form-control"/>
+                            <input type="text" id="firstName" name="name" placeholder="Enter your name" class="form-control" required/>
                         </div>
 
                         <!--nick name-->
@@ -41,7 +43,7 @@
                                 </div>
                             </div>
 
-                            <input type="text" id="nickName" name="nickName" placeholder="Enter your nick name" class="form-control"/>
+                            <input type="text" id="nickName" name="nickName" placeholder="Enter your nick name" class="form-control" required/>
                         </div>
 
                          <!--phone number-->
@@ -52,7 +54,7 @@
                                 </div>
                             </div>
 
-                            <input type="number" id="phone" name="phone" placeholder="Enter your phone no." class="form-control"/>
+                            <input type="number" id="phone" name="phone" placeholder="Enter your phone no." class="form-control" min="10" required/>
                         </div>
 
                          <!--email address-->
@@ -63,7 +65,7 @@
                                 </div>
                             </div>
 
-                            <input type="email" id="email" name="email" placeholder="Enter your email address" class="form-control"/>
+                            <input type="email" id="email" name="email" placeholder="Enter your email address" class="form-control" required/>
                         </div>
 
                          <!--workspace-->
@@ -74,12 +76,12 @@
                                 </div>
                             </div>
 
-                            <input type="text" id="work" name="work" placeholder="Enter your workspace" class="form-control"/>
+                            <input type="text" id="work" name="work" placeholder="Enter your workspace" class="form-control" required/>
                         </div>
 
                         <!--Contact Description-->
                         <div class="form-group mt-3">
-                            <textarea name="description" id="description" class="form-control" placeholder="Enter contact description" rows="5"></textarea>
+                            <textarea name="description" id="mytextarea" class="form-control" placeholder="Enter contact description" rows="5" ></textarea>
                         </div>
 
                          <!--Contact Image-->
@@ -100,19 +102,25 @@
 
         </div>
     </div>
+
+     <!--TinyMCE editor-->
+     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+     <script>
+         tinymce.init({
+           selector: '#mytextarea'
+         });
+       </script>
+
 </section>
 
+<!-- Integrating TinyMCE editor to Add Contacts page.
 
-<!-- Adding alert on registration
+  Note: make description datatype as longtext to save unlimited data from description, but its better to have some restriction say 5000 characters.
+  
+  @Column(length = 5000)
+  private String description; 
 
-1. add alert code of bootstrap to Add Contact page
-2. Add message will be done by controller
-	- success
-	- error
-   To do this we require session, we will HTTP Session. i.e HttpSession session
-3. if there is session in message, then show message on Add Contact page.
-
-(Note: we are going to write this code in base.html) -->
+-->
 
 </body>
 </html>

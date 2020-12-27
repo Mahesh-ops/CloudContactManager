@@ -16,7 +16,7 @@ public class Contact {
     private String email;
     private String phone;
     private String image; //image name will be save here.
-    @Column(length = 500)
+    @Column(length = 5000)
     private String description;
 
     //now, 'many contact belongs to one user', as this is bidirectional mapping, here it will be 'many-to-one' i.e reverse.
