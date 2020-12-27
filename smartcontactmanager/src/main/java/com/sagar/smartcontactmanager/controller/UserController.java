@@ -18,11 +18,15 @@ import com.sagar.smartcontactmanager.helper.Message;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -87,6 +91,8 @@ public class UserController {
             if(file.isEmpty()){
                 //for developers only..
                 System.out.println("Image File is empty...");
+
+                
             } else {
                 //upload file to folder and update name of contact.
                 contact.setImage(file.getOriginalFilename());
@@ -129,19 +135,24 @@ public class UserController {
     }
 
     //show view contacts handler
-    @GetMapping("/show-contacts")
-    public String showContacts(Model m, Principal principal){
+    @GetMapping("/show-contacts/{page}")
+    public String showContacts(@PathVariable("page") Integer page, Model  m, Principal principal){
 
         m.addAttribute("title", "View Contacts");
 
         String userName = principal.getName(); //getting email
         User user = this.userRepository.getUserByUserName(userName); //this returns user
 
-        //we are going to make contact repository, to make changes in contacts
-        List<Contact> contacts = this.contactRepository.findContactsByUser(user.getId()); //using user, we can get their id.
+        //making object for pagination
+        Pageable pageable = PageRequest.of(page, 3);
+
+        //this is going to return Page<Contact> of contacts not List<> of contacts
+        Page<Contact> contacts = this.contactRepository.findContactsByUser(user.getId(), pageable); //using user, we can get their id.
 
         //adding pagination, getting list of contacts
-        m.addAttribute("contacts", contacts);
+        m.addAttribute("contacts", contacts); //getting current page (already getting earlier also)
+        m.addAttribute("currentPage", page); //contacts per page.
+        m.addAttribute("totalPages", contacts.getTotalPages()); //returns all pages 
 
         return "normal/show_contacts";
     }

@@ -33,60 +33,44 @@
                   </tr>
                 </tbody>
               </table>
+
+              <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li th:if="${currentPage != 0}" class="page-item"><a th:href="@{'/user/show-contacts/'+${currentPage-1}}" class="page-link" href="#">Previous</a></li>
+		   
+		   
+		   
+                    <li th:classappend="${currentPage==i-1?'active':''}" th:each="i : ${#numbers.sequence(1,totalPages)}" class="page-item"><a th:href="@{'/user/show-contacts/'+${i-1}}" class="page-link" href="#"><span th:text="${i}"></span></a></li>
+                    
+                
+                    <li th:if="${currentPage+1 != totalPages}" class="page-item"><a th:href="@{'/user/show-contacts/'+${currentPage+1}}" class="page-link" href="#">Next</a></li>
+                </ul>
+              </nav>
         </div>
     </div>
 </section>
 
-<!-- Showing contacts in effective manner...
 
-1. make new handler in UserController
-    - to send data we will use Model
-    - to send message we require session
-    - we require to create new html file, show_contacts.html
-    - link this page to navbar of user dashboard. i.e base.html 
-    
-    - now we have to send data and connect to this page.
-	- pass title in UserController.
-	- get all users using Principal
-    
-    //show view contacts handler
-    @GetMapping("/show-contacts")
-    public String showContacts(Model m, Principal principal){
+<!-- 
+Pagination...
 
-        m.addAttribute("title", "View Contacts");
+1. Get bootstrap pagination first and add this code to show_contacts.html
+2. from backend we are going to send the contacts to page...e.g 5, 10, 15 etc..
+3. we have to use PathVariable("page") as Integer page.
+4. //replacing List with Page, Pageable will have current page & records per page. (in ContactRepository.java)
+public Page<Contact> findContactsByUser(@Param("userId") int userId, Pageable pageable); 
 
-        //sending contacts from database and then display
-        String userName = principal.getName();
-        User user = this.userRepository.getUserByUserName(userName);
-        List<Contact> contacts = user.getContacts(); //this gives complete list of all contacts.
+5. In UserController.java
+	//this is going to return Page<Contact> of contacts not List<> of contacts
+        Page<Contact> contacts = this.contactRepository.findContactsByUser(user.getId(), pageable); //using user, we can get their id.
 
-        //we are going to make contact repository instead of above method., to make changes in contacts
+        //adding pagination, getting list of contacts
+        m.addAttribute("contacts", contacts); //getting current page (already getting earlier also)
+        m.addAttribute("currentPage", page); //contacts per page.
+        m.addAttribute("totalPage", contacts.getTotalPages());
 
-        return "normal/show_contacts";
-    }
+6. now we will come to front end where we have added bootstrap page code and lets modify it. -->
 
-
-showing contacts in Effective manner - Pagination
--- creating ContactRepository in Dao.
-	- we are going to make contact repository instead of above method., to make changes in contacts
-	    the following method will going to make where query according to user id.
-	     @Query("from Contact as c where c.user.id =:userId")
-    	     public List<Contact> findContactsByUser(@Param("userId") int userId);
-
-	- with the help of ContactRepository, we are going to fetch all contacts of user.
-	- Doing Autowire in UserController of ContactRepository.
-	- note if we use this.contactRepository.findAll();, this is return is going to return all the contents of contacts from the database.
-	  we require to fetch contact only of logged in user.
-	e.g public List<Contact> findContactsByUser(int userId);
-
-	//adding pagination
-        m.addAttribute("contacts", contacts);
-	
-	
-Come back to show_contacts.html
-	- showing all contacts (using bootstrap table)
-
--->
 
 </body>
 </html>
