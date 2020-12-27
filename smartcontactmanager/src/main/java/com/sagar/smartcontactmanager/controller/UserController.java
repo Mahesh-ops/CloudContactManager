@@ -161,26 +161,27 @@ public class UserController {
 
     //showing particular contact details
     @GetMapping("/{cId}/contact")
-    public String showContactDetail(@PathVariable("cId") Integer cId, Model model){ //we cId we fetch contact details.
-        System.out.println(cId);
+    public String showContactDetail(@PathVariable("cId") Integer cId, Model model, Principal principal) { //using cId we fetch contact details.
+        
+        System.out.println("CID " + cId);
 
         Optional<Contact> contactOptional = this.contactRepository.findById(cId);
         Contact contact = contactOptional.get(); //so now we will get only those contact who have pass that their id
 
+        //solving security bug, get details of logged in user using Principal.
+        String userName = principal.getName(); //getting email
+        User user = this.userRepository.getUserByUserName(userName); //this returns user
+
         //sending this contact to view, we have to use Model
-        model.addAttribute("contact", contact);
+        //checking if user id is equal to contact id of only logged in user.
+        if (user.getId() == contact.getUser().getId()) {
+			model.addAttribute("contact", contact);
+			model.addAttribute("title", contact.getName());
+		}
 
         return "normal/contact_detail";
     }
 
-    // Adding Images to profile
-	// - setting default image, contact.png
-	// - making link clickable via email on user id.
-	// - making handler to show contact details(click from email link)
-	// - we cId we fetch contact details.
-	// - create new page contact_detail.html and design it.
-
-	// - now using handler we have to only details for particular id only, we will use contact repository and finally pass contact using Model
 	
 }
 
