@@ -92,3 +92,11 @@ body {
 }
 
 /* end of sidebar css*/
+
+/* contact default profile picture css*/
+.my_profile_picture{
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}

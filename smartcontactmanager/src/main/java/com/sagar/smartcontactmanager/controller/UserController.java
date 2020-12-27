@@ -7,9 +7,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.sagar.smartcontactmanager.dao.ContactRepository;
 import com.sagar.smartcontactmanager.dao.UserRepository;
 import com.sagar.smartcontactmanager.entities.Contact;
@@ -92,7 +94,7 @@ public class UserController {
                 //for developers only..
                 System.out.println("Image File is empty...");
 
-                
+                contact.setImage("image"); //setting default contact image
             } else {
                 //upload file to folder and update name of contact.
                 contact.setImage(file.getOriginalFilename());
@@ -156,5 +158,29 @@ public class UserController {
 
         return "normal/show_contacts";
     }
+
+    //showing particular contact details
+    @GetMapping("/{cId}/contact")
+    public String showContactDetail(@PathVariable("cId") Integer cId, Model model){ //we cId we fetch contact details.
+        System.out.println(cId);
+
+        Optional<Contact> contactOptional = this.contactRepository.findById(cId);
+        Contact contact = contactOptional.get(); //so now we will get only those contact who have pass that their id
+
+        //sending this contact to view, we have to use Model
+        model.addAttribute("contact", contact);
+
+        return "normal/contact_detail";
+    }
+
+    // Adding Images to profile
+	// - setting default image, contact.png
+	// - making link clickable via email on user id.
+	// - making handler to show contact details(click from email link)
+	// - we cId we fetch contact details.
+	// - create new page contact_detail.html and design it.
+
+	// - now using handler we have to only details for particular id only, we will use contact repository and finally pass contact using Model
+	
 }
 

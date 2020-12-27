@@ -21,16 +21,23 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr th:each="c : ${contacts}"> <!--Getting list of contacts from, m.addAttribute("contacts", contacts);-->
-                    <th scope="row" th:text="${'SCMUSER'+ c.cId}">1</th>
-                    <td th:text="${c.name}">Mark</td>
-                    <td th:text="${c.email}">Otto</td>
-                    <td th:text="${c.phone}">@mdo</td>
-                    <td>
-                        <button class="btn btn-sm btn-danger">Delete</button>
-                        <button class="btn btn-sm btn-primary">Update</button>
-                    </td>
-                  </tr>
+                    <tr th:each="c : ${contacts}"> <!--Getting list of contacts from, m.addAttribute("contacts", contacts);-->
+                      <th scope="row" th:text="${'SCMUSER'+ c.cId}">1</th>
+                      <td>
+                          <img src="" alt="profile photo" class="my_profile_picture" th:src="@{'/img/'+${c.image}}"/>
+                          <span th:text="${c.name}"></span>
+                      </td>
+                      <td>
+                          <a href="" th:href="@{'/user/'+${c.cId}+'/contact'}">
+                              <span th:text="${c.email}"></span>
+                          </a>
+                      </td>
+                      <td th:text="${c.phone}">@mdo</td>
+                      <td>
+                          <button class="btn btn-sm btn-danger">Delete</button>
+                          <button class="btn btn-sm btn-primary">Update</button>
+                      </td>
+                    </tr>
                 </tbody>
               </table>
 
@@ -49,27 +56,6 @@
         </div>
     </div>
 </section>
-
-
-<!-- 
-Pagination...
-
-1. Get bootstrap pagination first and add this code to show_contacts.html
-2. from backend we are going to send the contacts to page...e.g 5, 10, 15 etc..
-3. we have to use PathVariable("page") as Integer page.
-4. //replacing List with Page, Pageable will have current page & records per page. (in ContactRepository.java)
-public Page<Contact> findContactsByUser(@Param("userId") int userId, Pageable pageable); 
-
-5. In UserController.java
-	//this is going to return Page<Contact> of contacts not List<> of contacts
-        Page<Contact> contacts = this.contactRepository.findContactsByUser(user.getId(), pageable); //using user, we can get their id.
-
-        //adding pagination, getting list of contacts
-        m.addAttribute("contacts", contacts); //getting current page (already getting earlier also)
-        m.addAttribute("currentPage", page); //contacts per page.
-        m.addAttribute("totalPage", contacts.getTotalPages());
-
-6. now we will come to front end where we have added bootstrap page code and lets modify it. -->
 
 
 </body>
