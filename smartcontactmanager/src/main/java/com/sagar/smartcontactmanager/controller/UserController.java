@@ -7,9 +7,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 
+import javax.servlet.http.HttpSession;
+
 import com.sagar.smartcontactmanager.dao.UserRepository;
 import com.sagar.smartcontactmanager.entities.Contact;
 import com.sagar.smartcontactmanager.entities.User;
+import com.sagar.smartcontactmanager.helper.Message;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -67,7 +70,8 @@ public class UserController {
             @ModelAttribute Contact contact, 
             @RequestParam("profileImage") 
             MultipartFile file, 
-            Principal principal) {
+            Principal principal,
+            HttpSession session) {
 
         try {
             String name = principal.getName(); //we will get name of only logged in user.
@@ -102,24 +106,20 @@ public class UserController {
             this.userRepository.save(user); //this line is saving data into database/
 
             System.out.println("DATA " +contact);
-            System.out.println("Contact added to database successfully.");
+            System.out.println("Contact saved to database successfully.");
+
+            //success message on contact saving.
+            session.setAttribute("message", new Message("Contact Added Successfully!", "success"));
+
+
         } catch(Exception e){
             System.out.println("ERROR!" +e.getMessage());
             e.printStackTrace();
+
+            //error message on contact not saving.
+            session.setAttribute("message", new Message("Something Went Wrong!", "danger"));
         }
         return "normal/add_contact_form";
     }
 }
 
-
-/*
-now before saving image to db, we will first upload file and save it to database.
-
-2. Now this file will come to which variable?
-@RequestParam("profileImage")
-
- Again this file has to save in some format right?
- -> for this we have object called MultipartFile file
-
-3. Finally we will process that file.
-*/
