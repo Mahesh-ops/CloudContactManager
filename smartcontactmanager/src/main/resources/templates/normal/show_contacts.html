@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="normal/base::layout(~{::section})">
+<head>
+    <meta charset="UTF-8">
+    <title>Show contacts</title>
+</head>
+<body>
+<section>
+    <div class="card mr-3 ml-3">
+        <div class="card-body">
+            <h1 class="text-center"> Your Contacts</h1>
+
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="c : ${contacts}"> <!--Getting list of contacts from, m.addAttribute("contacts", contacts);-->
+                    <th scope="row" th:text="${'SCMUSER'+ c.cId}">1</th>
+                    <td th:text="${c.name}">Mark</td>
+                    <td th:text="${c.email}">Otto</td>
+                    <td th:text="${c.phone}">@mdo</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                        <button class="btn btn-sm btn-primary">Update</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+</section>
+
+<!-- Showing contacts in effective manner...
+
+1. make new handler in UserController
+    - to send data we will use Model
+    - to send message we require session
+    - we require to create new html file, show_contacts.html
+    - link this page to navbar of user dashboard. i.e base.html 
+    
+    - now we have to send data and connect to this page.
+	- pass title in UserController.
+	- get all users using Principal
+    
+    //show view contacts handler
+    @GetMapping("/show-contacts")
+    public String showContacts(Model m, Principal principal){
+
+        m.addAttribute("title", "View Contacts");
+
+        //sending contacts from database and then display
+        String userName = principal.getName();
+        User user = this.userRepository.getUserByUserName(userName);
+        List<Contact> contacts = user.getContacts(); //this gives complete list of all contacts.
+
+        //we are going to make contact repository instead of above method., to make changes in contacts
+
+        return "normal/show_contacts";
+    }
+
+
+showing contacts in Effective manner - Pagination
+-- creating ContactRepository in Dao.
+	- we are going to make contact repository instead of above method., to make changes in contacts
+	    the following method will going to make where query according to user id.
+	     @Query("from Contact as c where c.user.id =:userId")
+    	     public List<Contact> findContactsByUser(@Param("userId") int userId);
+
+	- with the help of ContactRepository, we are going to fetch all contacts of user.
+	- Doing Autowire in UserController of ContactRepository.
+	- note if we use this.contactRepository.findAll();, this is return is going to return all the contents of contacts from the database.
+	  we require to fetch contact only of logged in user.
+	e.g public List<Contact> findContactsByUser(int userId);
+
+	//adding pagination
+        m.addAttribute("contacts", contacts);
+	
+	
+Come back to show_contacts.html
+	- showing all contacts (using bootstrap table)
+
+-->
+
+</body>
+</html>

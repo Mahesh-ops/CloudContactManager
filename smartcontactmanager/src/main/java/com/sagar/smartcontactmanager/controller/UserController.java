@@ -6,9 +6,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.sagar.smartcontactmanager.dao.ContactRepository;
 import com.sagar.smartcontactmanager.dao.UserRepository;
 import com.sagar.smartcontactmanager.entities.Contact;
 import com.sagar.smartcontactmanager.entities.User;
@@ -16,6 +18,7 @@ import com.sagar.smartcontactmanager.helper.Message;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +34,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ContactRepository contactRepository;
 
     //Adding common data to response, making method to add all users
     @ModelAttribute //now this works for all i.e for /index and /add-contact also
@@ -120,6 +126,24 @@ public class UserController {
             session.setAttribute("message", new Message("Something Went Wrong!", "danger"));
         }
         return "normal/add_contact_form";
+    }
+
+    //show view contacts handler
+    @GetMapping("/show-contacts")
+    public String showContacts(Model m, Principal principal){
+
+        m.addAttribute("title", "View Contacts");
+
+        String userName = principal.getName(); //getting email
+        User user = this.userRepository.getUserByUserName(userName); //this returns user
+
+        //we are going to make contact repository, to make changes in contacts
+        List<Contact> contacts = this.contactRepository.findContactsByUser(user.getId()); //using user, we can get their id.
+
+        //adding pagination, getting list of contacts
+        m.addAttribute("contacts", contacts);
+
+        return "normal/show_contacts";
     }
 }
 
