@@ -25,12 +25,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +49,7 @@ public class UserController {
     //Adding common data to response, making method to add all users
     @ModelAttribute //now this works for all i.e for /index and /add-contact also
     public void addCommonData(Model model, Principal principal){ //addCommanData will work for both index as well as add-contact
+        
         //to get username we need object of dao i.e UserRepository.
         String userName = principal.getName();
 		System.out.println("USERNAME " + userName);
@@ -63,6 +66,7 @@ public class UserController {
     @RequestMapping("/index")
     public String dashboard(Model model, Principal principal) {
 
+        model.addAttribute("title", "User Dashboard");
         return "normal/user_dashboard";
     }
 
@@ -103,7 +107,7 @@ public class UserController {
                 File saveFile = new ClassPathResource("static/img").getFile();
 
                 //getting path name and appending name to file
-                Path path = Paths.get(saveFile.getAbsolutePath()+File.separator+file.getOriginalFilename()+file.getName());
+                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
 
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
@@ -112,9 +116,9 @@ public class UserController {
             }
 
             //this is bi-direction mapping contact to user and user to contact
-            contact.setUser(user);
             user.getContacts().add(contact);
-
+            contact.setUser(user);
+            
             //now before saving image to db, we will first upload file and save it to database.
 
             this.userRepository.save(user); //this line is saving data into database/
@@ -184,6 +188,7 @@ public class UserController {
 
     //delete contact handler
     @GetMapping("/delete/{cid}")
+    @Transactional
     public String deleteContact(@PathVariable("cid") Integer cId, Model model, HttpSession session){
 
         Optional<Contact> contactoptional = this.contactRepository.findById(cId);
@@ -208,6 +213,68 @@ public class UserController {
         
         return "redirect:/user/show-contacts/0";
     }
+
+    //update form handler
+    @PostMapping("/update-contact/{cid}")
+    public String updateForm(@PathVariable("cid") Integer cid, Model model){
+
+        model.addAttribute("title", "Update Contacts");
+
+        Contact contact = this.contactRepository.findById(cid).get();
+        model.addAttribute("contact", contact);
+
+        return "normal/update_form";
+    }
+
+    // update contact handler
+	@RequestMapping(value = "/process-update", method = RequestMethod.POST)
+	public String updateHandler(@ModelAttribute Contact contact, @RequestParam("profileImage") MultipartFile file,
+			Model m, HttpSession session, Principal principal) {
+
+		try {
+
+			// old contact details
+			Contact oldcontactDetail = this.contactRepository.findById(contact.getcId()).get();
+
+			// image..
+			if (!file.isEmpty()) {
+
+                //delete old photo
+
+				File deleteFile = new ClassPathResource("static/img").getFile();
+				File file1 = new File(deleteFile, oldcontactDetail.getImage());
+				file1.delete();
+
+				//update new photo
+
+				File saveFile = new ClassPathResource("static/img").getFile();
+
+				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
+
+				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+				contact.setImage(file.getOriginalFilename());
+
+			} else {
+				contact.setImage(oldcontactDetail.getImage());
+			}
+
+			User user = this.userRepository.getUserByUserName(principal.getName());
+
+			contact.setUser(user);
+
+			this.contactRepository.save(contact);
+
+			session.setAttribute("message", new Message("Your Contact is updated successfully!...", "success"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("CONTACT NAME " + contact.getName());
+		System.out.println("CONTACT ID " + contact.getcId());
+		return "redirect:/user/" + contact.getcId() + "/contact";
+	}
 
 	
 }

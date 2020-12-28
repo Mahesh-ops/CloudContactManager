@@ -99,6 +99,28 @@
 <script th:src="@{/js/bootstrap.min.js}"></script>
 <!-- <script th:src="@{/js/bootstrap.bundle.min.js}"></script> -->
 
+ <!--Sweet alert cdn-->
+ <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+ <script>
+     function deleteContact(cId){
+                swal({
+        title: "Are you sure?",
+        text: "Are you sure you want to delete the contact?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+        })
+        .then((willDelete) => {
+        if (willDelete) {
+            //redirect after delete
+            window.location-"/user/delete/"+cid;
+        } else {
+            swal("Your Contact is safe!");
+        }
+        });
+            }
+ </script>
 
 <script th:src="@{/js/script.js}"></script>
 
