@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+
 import com.sagar.smartcontactmanager.dao.ContactRepository;
 import com.sagar.smartcontactmanager.dao.UserRepository;
 import com.sagar.smartcontactmanager.entities.Contact;
@@ -23,7 +23,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -97,9 +96,9 @@ public class UserController {
             if(file.isEmpty()){
                 //for developers only..
                 System.out.println("Image File is empty...");
-
-                contact.setImage("image"); //setting default contact image
-            } else {
+                contact.setImage("contact.png"); //setting default contact image from img
+            } 
+            else {
                 //upload file to folder and update name of contact.
                 contact.setImage(file.getOriginalFilename());
 
@@ -186,47 +185,46 @@ public class UserController {
         return "normal/contact_detail";
     }
 
-    //delete contact handler
+    //Delete contact handler
     @GetMapping("/delete/{cid}")
-    @Transactional
-    public String deleteContact(@PathVariable("cid") Integer cId, Model model, HttpSession session){
+	@Transactional
+	public String deleteContact(@PathVariable("cid") Integer cId, Model model, HttpSession session,
+			Principal principal)  {
+		System.out.println("CID " + cId);
 
-        Optional<Contact> contactoptional = this.contactRepository.findById(cId);
-        Contact contact = contactoptional.get();
+		Contact contact = this.contactRepository.findById(cId).get();
+         // check...Assignment..image delete
+		
+		//delete old photo
 
-        //above contact can be delete of respective id using contactRepository 
-        this.contactRepository.delete(contact);
+		
+		User user = this.userRepository.getUserByUserName(principal.getName());
+		
+		user.getContacts().remove(contact);
+		
+		this.userRepository.save(user);
 
-        //checking for securely delete using id..Assingment
-        System.out.println("Contact " +contact.getcId());
+		
+		System.out.println("DELETED");
+		session.setAttribute("message", new Message("Contact deleted succesfully...", "success"));
 
-        //If contact is not deleting directly, then before delete we are going to unlink contact
-        contact.setUser(null);
-
-        //remove image after contact is deleted, hint get image path and name
-        contact.getImage();
-
-        this.contactRepository.delete(contact);
-        System.out.println("Contact Deleted ");
-        
-        session.setAttribute("message", new Message("Contact deleted sucessfully...!", "success"));
-        
-        return "redirect:/user/show-contacts/0";
-    }
+		return "redirect:/user/show-contacts/0";
+	}
 
     //update form handler
-    @PostMapping("/update-contact/{cid}")
-    public String updateForm(@PathVariable("cid") Integer cid, Model model){
+	@PostMapping("/update-contact/{cid}")
+	public String updateForm(@PathVariable("cid") Integer cid, Model m) {
 
-        model.addAttribute("title", "Update Contacts");
+		m.addAttribute("title", "Update Contact");
 
-        Contact contact = this.contactRepository.findById(cid).get();
-        model.addAttribute("contact", contact);
+		Contact contact = this.contactRepository.findById(cid).get();
 
-        return "normal/update_form";
-    }
+		m.addAttribute("contact", contact);
 
-    // update contact handler
+		return "normal/update_form";
+	}
+
+	// update contact handler
 	@RequestMapping(value = "/process-update", method = RequestMethod.POST)
 	public String updateHandler(@ModelAttribute Contact contact, @RequestParam("profileImage") MultipartFile file,
 			Model m, HttpSession session, Principal principal) {
@@ -239,20 +237,16 @@ public class UserController {
 			// image..
 			if (!file.isEmpty()) {
 
-                //delete old photo
+				//delete old photo
 
 				File deleteFile = new ClassPathResource("static/img").getFile();
 				File file1 = new File(deleteFile, oldcontactDetail.getImage());
 				file1.delete();
 
 				//update new photo
-
 				File saveFile = new ClassPathResource("static/img").getFile();
-
 				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
-
 				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
 				contact.setImage(file.getOriginalFilename());
 
 			} else {
@@ -265,7 +259,7 @@ public class UserController {
 
 			this.contactRepository.save(contact);
 
-			session.setAttribute("message", new Message("Your Contact is updated successfully!...", "success"));
+			session.setAttribute("message", new Message("Your contact is updated...", "success"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -276,6 +270,9 @@ public class UserController {
 		return "redirect:/user/" + contact.getcId() + "/contact";
 	}
 
+    // Delete Contacts
+	// - In User.java entity, Replace mappedBy = "user" with orphanRemoval = true
+	// - Update the delete contact handler
 	
 }
 

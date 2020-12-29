@@ -37,7 +37,7 @@ public class User  {
     private String about;
 
     //now, 'one user can have many contacts', we can use list, set etc.
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user") //cascade, auto save, delete etc. i.e If user is save, then contact will auto saved.
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true) //cascade, auto save, delete etc. i.e If user is save, then contact will auto saved.
     private List<Contact> contacts = new ArrayList<>();
 
     //generate getter and setter for ArrayList
@@ -134,21 +134,12 @@ public class User  {
     }
 
     //generate toString() method.
-
     @Override
-    public String toString() {
-        return "{" +
-            " id='" + getId() + "'" +
-            ", name='" + getName() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", password='" + getPassword() + "'" +
-            ", role='" + getRole() + "'" +
-            ", enabled='" + isEnabled() + "'" +
-            ", imageUrl='" + getImageUrl() + "'" +
-            ", about='" + getAbout() + "'" +
-            ", contacts='" + getContacts() + "'" +
-            "}";
-    }
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + ", email=" + email + ", password=" + password + ", role=" + role
+				+ ", enabled=" + enabled + ", imageUrl=" + imageUrl + ", about=" + about + ", contacts=" + contacts
+				+ "]";
+	}
     
     
 }
