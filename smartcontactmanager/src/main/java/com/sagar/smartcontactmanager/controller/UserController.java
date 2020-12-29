@@ -270,9 +270,13 @@ public class UserController {
 		return "redirect:/user/" + contact.getcId() + "/contact";
 	}
 
-    // Delete Contacts
-	// - In User.java entity, Replace mappedBy = "user" with orphanRemoval = true
-	// - Update the delete contact handler
+    //your profile handler for dashboard
+    @GetMapping("/profile")
+    public String yourProfile(Model model){
+
+        model.addAttribute("title", "Profile");
+        return "normal/profile";
+    }
 	
 }
 
