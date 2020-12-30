@@ -3,6 +3,7 @@ package com.sagar.smartcontactmanager.dao;
 import java.util.List;
 
 import com.sagar.smartcontactmanager.entities.Contact;
+import com.sagar.smartcontactmanager.entities.User;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,7 @@ public interface ContactRepository extends JpaRepository<Contact, Integer> {
     //pagination
     @Query("from Contact as c where c.user.id =:userId")
     public Page<Contact> findContactsByUser(@Param("userId") int userId, Pageable pageable); 
+
+    //create search bar method by name
+    public List<Contact> findByNameContainingAndUser(String name, User user);
 }

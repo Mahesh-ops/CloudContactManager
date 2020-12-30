@@ -2,6 +2,8 @@ package com.sagar.smartcontactmanager.entities;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "CONTACT")
 public class Contact {
@@ -21,6 +23,7 @@ public class Contact {
 
     //now, 'many contact belongs to one user', as this is bidirectional mapping, here it will be 'many-to-one' i.e reverse.
     @ManyToOne
+    @JsonIgnore //not to serialize the user.
     private User user; //now one more column is created, treated as foreign key.
 
     //generate getter and setter for User.
